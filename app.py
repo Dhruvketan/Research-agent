@@ -1,5 +1,6 @@
 import argparse
 
+from agents.intent_agent import understand_intent
 from agents.planner import plan_topic
 from agents.search_agent import search_papers
 from agents.reader_agent import read_papers
@@ -9,7 +10,11 @@ from agents.memory_manager import MemoryManager
 
 
 def generate_report(topic: str) -> str:
-    tasks = plan_topic(topic)
+    intent = understand_intent(topic)
+    tasks = plan_topic(topic) + [
+        f"Use structured intent: {intent['query_type']} across {', '.join(intent['domains'])}",
+        "Validate retrieved papers for domain and technical relevance",
+    ]
     papers = search_papers(topic)
     notes = read_papers(papers)
     critique = validate_findings(notes)
