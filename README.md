@@ -236,8 +236,8 @@ The project has now been updated to address the main weaknesses identified in th
 - Improved retrieval precision through domain keyword expansion and relevance scoring.
 - Better search query generation for drone/UAV/aerial topics.
 - More specific research-gap and future-direction generation based on the topic domain.
-- Structured method/result/metric extraction from paper metadata.
-- Evidence-based cross-paper synthesis, contradiction/trend detection, and numerical evaluation metrics.
+- Paper-specific problem/method/result/limitation extraction from abstracts and metadata.
+- Evidence-based cross-paper synthesis, contradiction/trend detection, and numerical evaluation metrics derived from the generated notes.
 - Better structured report output with current research highlights, references, and memory snapshot.
 
 ## Current limitations

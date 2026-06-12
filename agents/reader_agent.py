@@ -1,12 +1,25 @@
+def _extract_problem(abstract: str) -> str:
+    text = abstract.lower()
+    if any(token in text for token in ["robot", "automation", "manufacturing", "factory", "additive"]):
+        return "Addresses industrial robotics, automation, or manufacturing-system challenges."
+    if any(token in text for token in ["drone", "uav", "flight", "aerial", "autonomous"]):
+        return "Addresses autonomous perception, control, or navigation for aerial systems."
+    if any(token in text for token in ["detection", "tracking", "benchmark", "challenge"]):
+        return "Addresses benchmark evaluation and comparative performance for the target task."
+    return "Addresses a domain-specific research challenge in the retrieved literature."
+
+
 def _extract_method(abstract: str) -> str:
     text = abstract.lower()
+    if any(token in text for token in ["robot", "manufacturing", "factory", "automation", "additive"]):
+        return "Uses robotics, industrial systems analysis, or manufacturing-process evaluation methods."
     if "end-to-end" in text or "neural" in text or "deep learning" in text:
         return "Uses end-to-end learning or neural perception/control methods."
     if "benchmark" in text or "dataset" in text:
         return "Uses benchmark datasets and evaluation protocols to compare methods."
     if "slam" in text or "tracking" in text:
         return "Uses perception and tracking pipelines for autonomous visual reasoning."
-    return "Uses a domain-specific visual perception or control approach described in the paper abstract."
+    return "Uses a domain-specific experimental or analytical method described in the paper abstract."
 
 
 def _extract_results(abstract: str) -> str:
@@ -16,6 +29,15 @@ def _extract_results(abstract: str) -> str:
     if "benchmark" in text or "challenge" in text:
         return "Provides benchmarked results and comparative evaluation for the target task."
     return "Reports empirical or methodological findings that support the topic area."
+
+
+def _extract_limitations(abstract: str) -> str:
+    text = abstract.lower()
+    if "outdoor" in text or "weather" in text or "robust" in text:
+        return "Highlights robustness, deployment, or environmental generalization as a limitation area."
+    if "real-time" in text or "compute" in text:
+        return "Suggests that onboard compute or real-time constraints may affect deployment."
+    return "The abstract does not provide full PDF-level limitations, so deployment caveats remain partially unresolved."
 
 
 def _extract_metrics(abstract: str) -> str:
@@ -39,10 +61,13 @@ def read_papers(papers: list[dict]) -> list[dict]:
         abstract = paper.get("abstract", "") or ""
         summary = abstract[:280] + ("..." if len(abstract) > 280 else "")
         title = paper.get("title", "Untitled paper")
-        summary = summary or f"This paper contributes current research on {title}."
+        problem = _extract_problem(abstract)
         method = _extract_method(abstract)
         results = _extract_results(abstract)
+        limitations = _extract_limitations(abstract)
         metrics = _extract_metrics(abstract)
+        summary = summary or f"This paper contributes current research on {title}."
+        summary = f"{problem} {summary}"
         notes.append(
             {
                 "title": title,
@@ -51,10 +76,11 @@ def read_papers(papers: list[dict]) -> list[dict]:
                 "doi": paper.get("doi", ""),
                 "summary": summary,
                 "objective": f"Examine the evidence and methodological contribution described in {title}.",
+                "problem": problem,
                 "methodology": method,
                 "results": results,
                 "metrics": metrics,
-                "limitations": "The available retrieval metadata may not contain full PDF text; conclusions therefore reflect abstract-level evidence.",
+                "limitations": limitations,
                 "citation": f"{title}. {paper.get('authors', ['Unknown author'])[:2]} ({paper.get('year', 'n.d.')}).",
             }
         )
