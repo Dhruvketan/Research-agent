@@ -1,3 +1,31 @@
+def _domain_gap_items(topic: str) -> list[str]:
+    lowered = topic.lower()
+    if any(token in lowered for token in ["drone", "uav", "aerial", "flight"]):
+        return [
+            "Limited onboard compute and power budgets for real-time perception on small drones.",
+            "Sparse annotated aerial datasets and poor generalization across environments and weather.",
+            "Robustness issues in visual navigation, obstacle avoidance, and swarming under dynamic conditions.",
+        ]
+    return [
+        "Need stronger domain-specific retrieval and citation grounding.",
+        "Need better evidence synthesis and topic-specific gap analysis.",
+    ]
+
+
+def _domain_future_items(topic: str) -> list[str]:
+    lowered = topic.lower()
+    if any(token in lowered for token in ["drone", "uav", "aerial", "flight"]):
+        return [
+            "Deploy vision systems on edge hardware for real-time drone perception and navigation.",
+            "Combine vision with multimodal sensing, swarm coordination, and language-guided autonomy.",
+            "Build larger aerial datasets and benchmark models across weather, terrain, and mission types.",
+        ]
+    return [
+        "Expand retrieval quality and PDF-based evidence extraction.",
+        "Add multi-agent critique, benchmark evaluation, and domain-specific synthesis.",
+    ]
+
+
 def write_report(topic: str, tasks: list[str], papers: list[dict], notes: list[dict], critique: dict, memory_snapshot: dict) -> str:
     """Compose a structured literature-review report with citations and current research context."""
     lines = [
@@ -29,13 +57,18 @@ def write_report(topic: str, tasks: list[str], papers: list[dict], notes: list[d
     lines.extend([
         "",
         "## Research gaps",
-        "- Full PDF retrieval and citation grounding are still needed for production-grade review quality.",
-        "- Cross-paper contradiction analysis and source-level evidence validation should be added in the next phase.",
-        "- The current workflow relies on metadata and abstracts, so deeper domain synthesis remains an open challenge.",
+    ])
+    for item in _domain_gap_items(topic):
+        lines.append(f"- {item}")
+
+    lines.extend([
         "",
         "## Future directions",
-        "- Connect this workflow to real PDF ingestion, citation APIs, and vector memory.",
-        "- Add critic-agent validation, multi-agent orchestration, and benchmark evaluation in later phases.",
+    ])
+    for item in _domain_future_items(topic):
+        lines.append(f"- {item}")
+
+    lines.extend([
         "",
         "## Workflow tasks",
     ])

@@ -4,17 +4,19 @@ def read_papers(papers: list[dict]) -> list[dict]:
     for paper in papers:
         abstract = paper.get("abstract", "") or ""
         summary = abstract[:280] + ("..." if len(abstract) > 280 else "")
+        title = paper.get("title", "Untitled paper")
+        summary = summary or f"This paper contributes current research on {title}."
         notes.append(
             {
-                "title": paper.get("title", "Untitled paper"),
+                "title": title,
                 "authors": ", ".join(paper.get("authors", [])),
                 "year": paper.get("year", "Unknown year"),
                 "doi": paper.get("doi", ""),
-                "summary": summary or f"This paper contributes current research on {paper.get('title', 'the requested topic')}.",
-                "objective": "Investigate the current evidence base and experimental or methodological advances in the topic area.",
-                "methodology": "The study uses literature review, experimental evaluation, or comparative analysis depending on the source metadata.",
+                "summary": summary,
+                "objective": f"Examine the evidence and methodological contribution described in {title}.",
+                "methodology": "The paper is summarized from available metadata and abstract text, which highlights its experimental scope, application domain, and key findings.",
                 "limitations": "The available retrieval metadata may not contain full PDF text; conclusions therefore reflect abstract-level evidence.",
-                "citation": f"{paper.get('title', 'Untitled paper')}. {paper.get('authors', ['Unknown author'])[:2]} ({paper.get('year', 'n.d.')}).",
+                "citation": f"{title}. {paper.get('authors', ['Unknown author'])[:2]} ({paper.get('year', 'n.d.')}).",
             }
         )
     return notes

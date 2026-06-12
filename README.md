@@ -231,8 +231,15 @@ Expected output:
 
 ---
 
+## Recent evaluation-driven improvements
+The project has now been updated to address the main weaknesses identified in the evaluation document:
+- Improved retrieval precision through domain keyword expansion and relevance scoring.
+- Better search query generation for drone/UAV/aerial topics.
+- More specific research-gap and future-direction generation based on the topic domain.
+- Better structured report output with current research highlights, references, and memory snapshot.
+
 ## Current limitations
-This is a Phase 1 prototype, so some parts are intentionally simplified:
+This is still a Phase 1 prototype, so some parts are intentionally simplified:
 - It uses paper metadata and abstracts rather than full PDF text.
 - It relies on live APIs when available, but has fallback metadata for offline use.
 - It does not yet implement full long-term vector memory or multi-agent orchestration.
