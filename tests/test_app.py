@@ -2,7 +2,7 @@ import unittest
 
 from app import generate_report
 from agents.intent_agent import classify_query_type, understand_intent
-from agents.search_agent import build_expanded_queries, expand_query_terms, filter_relevant_papers, score_paper_relevance
+from agents.search_agent import build_expanded_queries, expand_query_terms, filter_relevant_papers, score_paper_relevance, validate_source_metadata
 
 
 class ResearchAgentTests(unittest.TestCase):
@@ -10,14 +10,12 @@ class ResearchAgentTests(unittest.TestCase):
         report = generate_report("Applications of Gaussian Boson Sampling in Biological Systems")
 
         self.assertIn("Background", report)
-        self.assertIn("Key papers", report)
-        self.assertIn("Major findings", report)
-        self.assertIn("Research gaps", report)
-        self.assertIn("Future directions", report)
+        self.assertIn("Status", report)
         self.assertIn("References", report)
-        self.assertIn("Current research highlights", report)
-        self.assertIn("Cross-paper synthesis", report)
-        self.assertIn("Evaluation metrics", report)
+        self.assertTrue(
+            "Insufficient literature found." in report or "Current research highlights" in report,
+            report,
+        )
 
     def test_query_expansion_adds_domain_keywords(self):
         terms = expand_query_terms("Computer vision in drones")
@@ -66,6 +64,23 @@ class ResearchAgentTests(unittest.TestCase):
 
         self.assertEqual(len(filtered), 1)
         self.assertIn("Drone-based visual navigation", filtered[0]["title"])
+
+    def test_query_expansion_preserves_multi_word_concepts(self):
+        terms = expand_query_terms("Gaussian boson sampling in biological systems")
+
+        self.assertIn("gaussian boson sampling", terms)
+        self.assertIn("biological systems", terms)
+
+    def test_source_validation_rejects_placeholder_metadata(self):
+        papers = [
+            {"title": "Survey of Gaussian boson sampling", "source": "fallback", "doi": "10.0000/example.001", "pdf_url": "https://arxiv.org/abs/0000.00001"},
+            {"title": "Real quantum sampling study", "source": "arXiv", "doi": "https://doi.org/10.1000/test", "pdf_url": "https://arxiv.org/abs/2401.00001"},
+        ]
+
+        valid = validate_source_metadata(papers)
+
+        self.assertEqual(len(valid), 1)
+        self.assertEqual(valid[0]["title"], "Real quantum sampling study")
 
 
 if __name__ == "__main__":

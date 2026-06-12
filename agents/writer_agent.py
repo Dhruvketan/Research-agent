@@ -90,9 +90,23 @@ def write_report(topic: str, tasks: list[str], papers: list[dict], notes: list[d
         "",
         "## Background",
         f"This report summarizes the current research landscape for {topic}, using available metadata and abstracts from the retrieval layer.",
+    ]
+
+    if not papers or not notes:
+        lines.extend([
+            "",
+            "## Status",
+            "Insufficient literature found. The retrieval layer did not return any source-validated papers for this topic.",
+            "",
+            "## References",
+            "No verified references were available for this query.",
+        ])
+        return "\n".join(lines)
+
+    lines.extend([
         "",
         "## Current research highlights",
-    ]
+    ])
     for note in notes:
         lines.append(f"- {note['title']} ({note['year']}) — {note['summary']}")
 

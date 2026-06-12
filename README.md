@@ -11,7 +11,7 @@ The system is designed to behave like a junior research assistant:
 5. Compare findings and identify research gaps.
 6. Produce a structured report with references.
 
-This current version is a Phase 1 prototype that demonstrates the core workflow without requiring a full production-grade paper corpus.
+This repository now reflects Phase 2 roadmap work: the system is moving from simple retrieval-and-summary into a more intent-aware, concept-preserving research assistant with relevance filtering and source validation.
 
 ---
 
@@ -231,20 +231,20 @@ Expected output:
 
 ---
 
-## Recent evaluation-driven improvements
-The project has now been updated to address the main weaknesses identified in the evaluation document:
-- Improved retrieval precision through domain keyword expansion and relevance scoring.
-- Better search query generation for drone/UAV/aerial topics.
-- More specific research-gap and future-direction generation based on the topic domain.
-- Paper-specific problem/method/result/limitation extraction from abstracts and metadata.
-- Evidence-based cross-paper synthesis, contradiction/trend detection, and numerical evaluation metrics derived from the generated notes.
-- Better structured report output with current research highlights, references, and memory snapshot.
+## Recent Phase 2 improvements
+The project now includes the main roadmap upgrades for the next research-agent milestone:
+- Structured intent understanding and query-type classification for arbitrary research topics.
+- Multi-query retrieval that expands the candidate pool from the original topic and its subdomains.
+- Concept-preserving phrase extraction so multi-word scientific terms such as “Gaussian Boson Sampling” remain intact.
+- Relevance filtering to reduce semantic drift and reject weakly related papers before synthesis.
+- Source validation to reject placeholder or malformed metadata and avoid fabricated references.
+- A safer report path that reports “Insufficient literature found” when no valid source-backed papers are available.
 
 ## Current limitations
-This is still a Phase 1 prototype, so some parts are intentionally simplified:
-- It uses paper metadata and abstracts rather than full PDF text.
-- It relies on live APIs when available, but has fallback metadata for offline use.
-- It does not yet implement full long-term vector memory or multi-agent orchestration.
+This is now a Phase 2-style prototype, but several roadmap items are still future work:
+- It still relies on paper metadata and abstracts rather than full PDF text.
+- It uses live APIs when available, but real document ingestion and deeper citation grounding are still next steps.
+- It does not yet implement full long-term vector memory or full multi-agent orchestration.
 
 ---
 

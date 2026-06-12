@@ -17,11 +17,26 @@ DOMAIN_SYNONYMS = {
     "detection": ["detection", "object detection", "segmentation", "classification", "recognition"],
 }
 
+STOPWORDS = {"a", "an", "and", "for", "in", "of", "on", "the", "to", "with", "using", "into", "from", "vs", "versus", "by", "as", "at"}
+
+
+def extract_concepts(topic: str) -> list[str]:
+    """Extract multi-word scientific concepts from a user query without fragmenting them."""
+    words = [word for word in re.findall(r"[a-z0-9]+", topic.lower()) if word not in STOPWORDS]
+    phrases = set()
+    for size in range(2, min(4, len(words)) + 1):
+        for idx in range(len(words) - size + 1):
+            phrase = " ".join(words[idx:idx + size])
+            if len(phrase) >= 4:
+                phrases.add(phrase)
+    return sorted(phrases)[:10]
+
 
 def expand_query_terms(topic: str) -> list[str]:
-    """Expand a user topic with domain keywords to improve retrieval precision."""
+    """Expand a user topic with multi-word concepts and domain keywords to improve retrieval precision."""
     intent = understand_intent(topic)
-    terms = set(re.findall(r"[a-z0-9]+", topic.lower()))
+    terms = set(extract_concepts(topic))
+    terms.update(re.findall(r"[a-z0-9]+", topic.lower()))
     terms.update(intent["domains"])
     terms.update(intent["subtopics"])
 
@@ -86,26 +101,31 @@ def build_search_query(topic: str) -> str:
 
 
 def _fallback_papers(topic: str) -> list[dict]:
-    return [
-        {
-            "title": f"Survey of {topic}",
-            "authors": ["Research Team A"],
-            "year": 2024,
-            "doi": "10.0000/example.001",
-            "abstract": "A high-level review of current progress, datasets, and open challenges.",
-            "pdf_url": "https://arxiv.org/abs/0000.00001",
-            "source": "fallback",
-        },
-        {
-            "title": f"Experimental methods for {topic}",
-            "authors": ["Research Team B"],
-            "year": 2023,
-            "doi": "10.0000/example.002",
-            "abstract": "Describes experiments, evaluation criteria, and emerging applications.",
-            "pdf_url": "https://arxiv.org/abs/0000.00002",
-            "source": "fallback",
-        },
-    ]
+    return []
+
+
+def validate_source_metadata(papers: list[dict]) -> list[dict]:
+    """Reject placeholder or malformed paper metadata before synthesis."""
+    valid = []
+    for paper in papers:
+        title = (paper.get("title") or "").strip()
+        source = (paper.get("source") or "").strip()
+        doi = (paper.get("doi") or "").strip()
+        url = (paper.get("pdf_url") or paper.get("url") or "").strip()
+
+        has_valid_doi = bool(re.search(r"^10\.\d{4,9}/[-._;()/:A-Za-z0-9]+$", doi)) or "doi.org/10." in doi
+        has_valid_url = bool(re.match(r"https?://", url))
+
+        placeholder = any(token in doi.lower() for token in ["example", "0000.0000", "placeholder"]) or "survey of" in title.lower() and "example" in doi.lower()
+
+        if not title or not source:
+            continue
+        if not (has_valid_doi or has_valid_url):
+            continue
+        if placeholder:
+            continue
+        valid.append(paper)
+    return valid
 
 
 def search_papers(topic: str) -> list[dict]:
@@ -188,4 +208,6 @@ def search_papers(topic: str) -> list[dict]:
             seen.add(key)
             unique_papers.append(paper)
 
-    return _filter_relevant_papers(unique_papers, topic) or _filter_relevant_papers(_fallback_papers(topic), topic)
+    valid = validate_source_metadata(unique_papers)
+    filtered = _filter_relevant_papers(valid, topic)
+    return filtered if filtered else []
