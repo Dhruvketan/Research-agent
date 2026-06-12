@@ -1,0 +1,3 @@
+Applications of Gaussian Boson Sampling in Biological Systems
+Quorum sensing and antimicrobial resistance
+Reinforcement learning for autonomous robotics
