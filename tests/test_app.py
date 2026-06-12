@@ -15,6 +15,8 @@ class ResearchAgentTests(unittest.TestCase):
         self.assertIn("Future directions", report)
         self.assertIn("References", report)
         self.assertIn("Current research highlights", report)
+        self.assertIn("Cross-paper synthesis", report)
+        self.assertIn("Evaluation metrics", report)
 
     def test_query_expansion_adds_domain_keywords(self):
         terms = expand_query_terms("Computer vision in drones")
